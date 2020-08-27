@@ -1,5 +1,10 @@
 function x = fpolyn()
-%% This function is for factoring polynomial functions.To use this function to factor a polynomial function, please enter the COEFFICIENTS of the polynomial function's terms in order of CONSECUTIVE DESCENDING DEGREES, from the highest degree to zero degree (the constant), and FILLING IN ZEROES if a particular degree is missing in the function.  Also, please make sure that the polynomial funciton is in EXPANDED FORM. Additionally, make sure to put the list of coefficients in a square bracket. Example: [1,-2,0,4] for the polynomial function x^3 -2x^2 + 4.  *** OCTAVE SYMBOLIC PACKAGE IS REQUIRED. If you don't have it, use OCTAVE ONLINE. 
+%% This function is for factoring polynomial functions.
+%%To use this function to factor a polynomial function, 
+%%please enter the COEFFICIENTS of the polynomial function's terms in order of CONSECUTIVE DESCENDING DEGREES, 
+%%from the highest degree to zero degree (the constant), and FILLING IN ZEROES if a particular degree is missing in the function.  
+%%Also, please make sure that the polynomial funciton is in EXPANDED FORM. Additionally, make sure to put the list of coefficients in a square bracket. 
+%%Example: [1,-2,0,4] for the polynomial function x^3 -2x^2 + 4.  *** OCTAVE SYMBOLIC PACKAGE IS REQUIRED. If you don't have it, use OCTAVE ONLINE. 
 
   %% asking for user input
   warning('off','all')
