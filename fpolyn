@@ -1,0 +1,176 @@
+function x = fpolyn()
+%% This function is for factoring polynomial functions.To use this function to factor a polynomial function, please enter the COEFFICIENTS of the polynomial function's terms in order of CONSECUTIVE DESCENDING DEGREES, from the highest degree to zero degree (the constant), and FILLING IN ZEROES if a particular degree is missing in the function.  Also, please make sure that the polynomial funciton is in EXPANDED FORM. Additionally, make sure to put the list of coefficients in a square bracket. Example: [1,-2,0,4] for the polynomial function x^3 -2x^2 + 4.  *** OCTAVE SYMBOLIC PACKAGE IS REQUIRED. If you don't have it, use OCTAVE ONLINE. 
+
+  %% asking for user input
+  warning('off','all')
+
+  polyn = input ("Please enter your coefficients here: ");
+  fprintf('\n')
+  
+  
+  %% display polynomial function entered by the user, so they can check if it is entered correctly 
+  your_polyn = poly2sym(polyn);
+  disp('Your polynomial function is: ')
+  disp(your_polyn)
+  fprintf('\n')
+  
+  %%  length of polyn
+  term_num = length(polyn);
+  
+  %% number of zeroes at the end of polyn, which are Xs that can be factored out
+  
+    i = term_num;
+    num_zeros = 0;
+    
+    while polyn(i) == 0;
+        num_zeros = num_zeros + 1;
+        i = i - 1;
+    endwhile
+    num_zeros;
+    
+  %% determining the numerical coefficient of polyn
+  
+  check_int = floor(polyn) == polyn;
+  
+  if all(check_int == 1) == 1
+    coef = gcd(num2cell(polyn){:});
+    polyn = polyn/coef;
+  else
+      fracts = polyn(floor(polyn) ~= polyn);
+      d = [];
+      for i = 1:length(fracts)
+          [n,den] = numden(sym(fracts(i)));
+          d = [d den];
+          d = double(d);
+      endfor
+      d = unique(d);
+      common_denominator = prod(d);
+      polyn = polyn * common_denominator;
+      coef_1 = gcd(num2cell(polyn){:});
+      polyn = polyn / coef_1;
+      coef = coef_1 / common_denominator;
+  endif
+
+  %% determining the divisors of the first and last term of polyn that are used later for possible roots calculation
+  topDivs = div(abs(polyn(1)));
+  botDivs = div(abs(polyn(end)));
+  
+  %% calculation of possible roots
+  if botDivs ~= 0
+      possible_roots = [];
+      for r = 1:length(topDivs)
+        for c = 1:length(botDivs)
+          format rat
+          other_possible_roots = botDivs(c) / topDivs(r);
+          possible_roots = [possible_roots other_possible_roots];
+        endfor
+        possible_roots = [possible_roots other_possible_roots];
+      endfor
+      possible_roots = unique([possible_roots topDivs botDivs]);
+      possible_roots = [possible_roots -possible_roots];
+      
+  else
+      botDivs = div(abs(polyn(end-num_zeros)));
+      possible_roots = [];
+      for r = 1:length(topDivs)
+        for c = 1:length(botDivs)
+          format rat
+          other_possible_roots = botDivs(c) / topDivs(r);
+          possible_roots = [possible_roots other_possible_roots];
+        endfor
+        possible_roots = [possible_roots other_possible_roots];
+      endfor
+      possible_roots = unique([possible_roots topDivs botDivs]);
+      possible_roots = [possible_roots -possible_roots];
+  endif
+  
+  %%calculation of actual roots
+  roots = [];
+  for i = 1:length(possible_roots);
+    equation = [];
+    for t = 1:term_num
+        term = polyn(t)*(possible_roots(i))^(term_num-t);
+        equation = [equation term];
+    endfor
+    
+    total = sum(equation);
+    
+    if total == 0 
+        roots = [roots possible_roots(i)];
+    endif
+  endfor  
+  
+  %% factoring the function
+ polyn(end+1-num_zeros:end) = [];
+  for i = 1 : length(roots)
+      d = [1,-roots(i)];
+      [polyn,r] = deconv(polyn,d);
+  endfor
+  
+    if size(polyn) == [1,1]
+    coef_2 = polyn;
+    coef = coef*coef_2;
+    polyn = polyn/coef_2;
+  else
+    coef_2 = gcd(num2cell(polyn){:});
+    coef = coef*coef_2;
+    polyn = polyn/coef_2;
+  endif
+    
+  %% displaying the function's factors
+  
+  factors = [];
+  for i = 1:length(roots)
+      f = [1,-roots(i)];
+      f = poly2sym(f);
+      factors = [factors f];
+  end
+  
+  [r,c] = size(polyn);
+  
+  if c >= 3 
+      fprintf('** FACTOR THE LONGEST FACTOR ON THIS LIST WITH fpolyn() TO DOUBLE CHECK FOR FURTHER FACTORS** \n \n')
+  endif
+  
+  if size (polyn) == [1,1];
+    factors = [factors];
+  else
+    polyn = poly2sym(polyn);
+    factors = [factors polyn];
+  endif
+  
+  if num_zeros ~= 0
+      deg_x = zeros(1,num_zeros);
+      vcoef = [1 deg_x];
+      vcoef = poly2sym(vcoef);
+      factors = [factors poly2sym(vcoef)];
+  endif
+  
+  disp ("the factors of this polynomial function are:")
+  
+  for i = 1:length(factors)
+      disp(factors(i))
+  end
+  
+  fprintf('\n')
+  
+  disp ("the coefficient of this polynomial function is: ")
+  disp (coef)
+  
+  %% displaying the function's coefficient
+  %% another way to calculate actual roots
+  %%  roots = [];
+  %%for i = 1:length(possible_roots)
+  %%  d = [1,-possible_roots(i)]
+  %%  [q, r] = deconv(polyn, d)
+  %%  if r == 0;
+  %%    roots = [roots possible_roots(i)]
+  %%  endif
+  %%endfor
+endfunction
+
+function divisor = div(N);
+  N;
+  K=1:N;
+  divisor = K(rem(N,K)==0);
+endfunction
